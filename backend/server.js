@@ -1,0 +1,57 @@
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+
+
+import clientsRoutes       from './routes/clients.routes.js';
+
+import reclamationsRoutes  from './routes/reclamations.routes.js';
+
+import performancesRoutes  from './routes/performances.routes.js';
+
+
+const app = express();
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: { origin:'http://localhost:3000', methods: ['GET', 'POST', 'PUT', 'DELETE'] }
+});
+
+app.use(cors({
+  origin: 'http://localhost:3000',          
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,                        
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.set('io', io);
+
+// ── Routes ──
+
+app.use('/api/clients',       clientsRoutes);
+
+app.use('/api/reclamations',  reclamationsRoutes);
+app.use('/api/performances',  performancesRoutes);
+
+// ── Socket.IO ──
+io.on('connection', (socket) => {
+  socket.on('join_user',        (userId)        => socket.join(`user_${userId}`));
+  socket.on('join_tech',        (techId)        => socket.join(`tech_${techId}`));
+  socket.on('join_reclamation', (reclamationId) => socket.join(`reclamation_${reclamationId}`));
+  socket.on('disconnect', () => {});
+});
+
+// ── Santé ──
+app.get('/api/health', (_, res) => res.json({ status: 'OK', timestamp: new Date() }));
+
+// ── Erreurs globales ──
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Erreur serveur', details: err.message });
+});
+
+const PORT = process.env.PORT || 5000;
+httpServer.listen(PORT, () => console.log(`🚀 CRM AT — Serveur démarré sur le port ${PORT}`));
