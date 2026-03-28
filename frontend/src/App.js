@@ -1,27 +1,54 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';   // ← doit correspondre exactement
+// src/App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-// Client pages
-import ClientReclamation from './pages/client/Reclamation';
-import SuiviReclamation from './pages/client/SuiviReclamation';
-import Historique from './pages/client/Historique';
-// import Welcome from "./pages/welcome.jsx";
+// ── Pages auth ──────────────────────────────────────────────────────────────────
+import Welcome  from "./pages/welcome.jsx";
+import Login    from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import OtpPage  from "./pages/OtpPage.jsx";
+
+// ── Pages client (protégées) ────────────────────────────────────────────────────
+import Dashboard        from "./pages/client/Dashboard";
+import ClientReclamation from "./pages/client/Reclamation";
+import SuiviReclamation  from "./pages/client/SuiviReclamation";
+import Historique        from "./pages/client/Historique";
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Redirection par défaut */}
-          <Route path="/" element={<Navigate to="/client/historique" replace />} />
+          {/* ── Accueil ─────────────────────────────────────────────────────── */}
+          <Route path="/"        element={<Navigate to="/welcome" replace />} />
+          <Route path="/welcome" element={<Welcome />} />
 
-          {/* Pages Client */}
-          <Route path="/client/reclamation" element={<ClientReclamation />} />
-          <Route path="/client/suivi"       element={<SuiviReclamation />} />
-          <Route path="/client/historique"  element={<Historique />} />
+          {/* ── Auth ────────────────────────────────────────────────────────── */}
+          <Route path="/login"    element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/OtpPage"  element={<OtpPage />} />
 
-          {/* Page 404 */}
-          <Route path="*" element={<Navigate to="/client/historique" replace />} />
+          {/* ── Espace client (connexion obligatoire) ────────────────────────── */}
+          <Route
+            path="/client/dashboard"
+            element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
+          />
+          <Route
+            path="/client/reclamation"
+            element={<ProtectedRoute><ClientReclamation /></ProtectedRoute>}
+          />
+          <Route
+            path="/client/suivi"
+            element={<ProtectedRoute><SuiviReclamation /></ProtectedRoute>}
+          />
+          <Route
+            path="/client/historique"
+            element={<ProtectedRoute><Historique /></ProtectedRoute>}
+          />
+
+          {/* ── 404 ─────────────────────────────────────────────────────────── */}
+          <Route path="*" element={<Navigate to="/welcome" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -1,32 +1,37 @@
 // src/components/Button.jsx
-const Button = ({ type = "button", label, onClick, className = "" }) => {
+import { motion } from "framer-motion";
+
+const Button = ({ label, onClick, type = "button", disabled = false, variant = "primary" }) => {
+  const bg = {
+    primary: disabled ? "#90caf9" : "#0070B8",
+    outline: "transparent",
+    green: "#78BE20",
+  }[variant] || "#0070B8";
+
   return (
-    <button
+    <motion.button
       type={type}
       onClick={onClick}
-      className={`
-        relative overflow-hidden
-        cursor-pointer
-        bg-myBlack text-myWhite 
-        text[14px]
-        w-full md:w-[320px] py-3 rounded-lg 
-        font-semibold text-[12px]
-        transition-all duration-300 
-        hover:scale-[1.01] hover:shadow-xl
-        active:scale-[0.98]
-        group
-        ${className}
-      `}
-    > 
-      {/* Effet de brillance au survol */}
-      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent 
-                       translate-x-[-100%] group-hover:translate-x-[100%] 
-                       transition-transform duration-700 ease-in-out"></span>
-      
-      
-      {/* Texte */}
-      <span className="relative z-10">{label}</span>
-    </button>
+      disabled={disabled}
+      whileHover={!disabled ? { scale: 1.015, boxShadow: "0 6px 22px rgba(0,112,184,0.32)" } : {}}
+      whileTap={!disabled ? { scale: 0.985 } : {}}
+      style={{
+        width: "100%",
+        padding: "13px 0",
+        borderRadius: 10,
+        fontSize: 15,
+        fontWeight: 700,
+        cursor: disabled ? "not-allowed" : "pointer",
+        background: bg,
+        color: variant === "outline" ? "#0070B8" : "#fff",
+        border: variant === "outline" ? "2px solid #0070B8" : "none",
+        fontFamily: "inherit",
+        letterSpacing: 0.3,
+        transition: "background 0.2s",
+      }}
+    >
+      {label}
+    </motion.button>
   );
 };
 
