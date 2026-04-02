@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Bell, User } from 'lucide-react';
 // IMPORT CORRECT : Sans accolades car c'est un export par défaut
-import useAuth from '../../../hooks/useAuth'; 
+import { useAuth } from '../../../context/crm/AuthContext.jsx';
 
 export default function Header() {
   const { user } = useAuth();

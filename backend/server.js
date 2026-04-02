@@ -4,37 +4,54 @@ import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
+// Routes portail client
+import clientsRoutes      from './routes/Clients.routes.js';
+import reclamationsRoutes from './routes/Reclamations.routes.js';
+import performancesRoutes from './routes/performances.routes.js';
 
-import clientsRoutes       from './routes/clients.routes.js';
+// Routes CRM interne
+import crmAuthRoutes          from './routes/crm/auth.routes.js';
+import crmUsersRoutes         from './routes/crm/users.routes.js';
+import crmRolesRoutes         from './routes/crm/roles.routes.js';
+import crmLogsRoutes          from './routes/crm/logs.routes.js';
+import crmNotificationsRoutes from './routes/crm/notifications.routes.js';
 
-import reclamationsRoutes  from './routes/reclamations.routes.js';
-
-import performancesRoutes  from './routes/performances.routes.js';
-
+// Routes avec fichiers vides - TEMPORAIREMENT COMMENTÉES
+// import crmTechniciensRoutes   from './routes/crm/techniciens.routes.js';
+// import crmInterventionsRoutes from './routes/crm/interventions.routes.js';
 
 const app = express();
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
-  cors: { origin:'http://localhost:3000', methods: ['GET', 'POST', 'PUT', 'DELETE'] }
+  cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST', 'PUT', 'DELETE'] }
 });
 
 app.use(cors({
-  origin: 'http://localhost:3000',          
+  origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,                        
+  credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.set('io', io);
 
-// ── Routes ──
+// ── Routes portail client ──
+app.use('/api/clients',      clientsRoutes);
+app.use('/api/reclamations', reclamationsRoutes);
+app.use('/api/performances', performancesRoutes);
 
-app.use('/api/clients',       clientsRoutes);
+// ── Routes CRM interne ──
+app.use('/api/crm/auth',          crmAuthRoutes);
+app.use('/api/crm/users',         crmUsersRoutes);
+app.use('/api/crm/roles',         crmRolesRoutes);
+app.use('/api/crm/logs',          crmLogsRoutes);
+app.use('/api/crm/notifications', crmNotificationsRoutes);
 
-app.use('/api/reclamations',  reclamationsRoutes);
-app.use('/api/performances',  performancesRoutes);
+// Routes temporairement désactivées (fichiers vides)
+// app.use('/api/crm/techniciens',   crmTechniciensRoutes);
+// app.use('/api/crm/interventions', crmInterventionsRoutes);
 
 // ── Socket.IO ──
 io.on('connection', (socket) => {
